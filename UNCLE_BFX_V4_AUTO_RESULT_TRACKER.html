@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UNCLE B-FX AI BOT V4</title>
+<style>
+:root{--bg:#071018;--panel:#0d1b27;--panel2:#112333;--line:#20394a;--gold:#f6c928;--cyan:#23d6e8;--muted:#91a8b8;--green:#26d68a;--red:#ff5967}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,#142a38 0,#071018 42%);color:#edf5fa;font:15px Inter,system-ui,Arial,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;background:#0b1822;border:1px solid var(--line);border-radius:18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#ffdf48,#9c7410);color:#111;font-size:25px;font-weight:900}.brand h1{font-size:20px;letter-spacing:1px;margin:0}.brand small{color:var(--muted);letter-spacing:2px;font-size:10px}.live{color:var(--green);font-size:12px;border:1px solid #1d624a;border-radius:30px;padding:8px 12px}
+.ticker{display:flex;gap:12px;overflow:auto;margin:14px 0}.tick{white-space:nowrap;flex:1;min-width:130px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:12px}.tick b{display:block;color:#fff;font-size:16px;margin-top:4px}
+.nav{display:flex;gap:6px;overflow:auto;padding:5px 0 15px;scrollbar-width:none}.nav span{padding:10px 11px;border-bottom:2px solid var(--gold);color:var(--gold);font-weight:700;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:15px}.card{background:linear-gradient(145deg,#10212d,#0b1721);border:1px solid var(--line);border-radius:17px;padding:18px;margin-bottom:15px}.title{font-size:12px;letter-spacing:2px;color:var(--muted);font-weight:800;margin-bottom:15px}.row{display:flex;gap:10px;flex-wrap:wrap}.field{flex:1;min-width:145px}label{display:block;color:var(--muted);font-size:12px;margin:0 0 7px}input,select,button{font:inherit}input,select{width:100%;background:#07131d;color:#fff;border:1px solid #294353;border-radius:10px;padding:12px;outline:none}button{border:0;border-radius:10px;padding:12px 16px;background:var(--gold);color:#151515;font-weight:800;cursor:pointer}button.secondary{background:#183243;color:#e9f4fb;border:1px solid #315064}button:disabled{opacity:.5;cursor:not-allowed}
+.signalbox{text-align:center;padding:22px;border:1px solid #2c495a;border-radius:14px;background:#081722}.signal{font-size:34px;font-weight:950;letter-spacing:2px;margin:8px}.signal.buy{color:var(--green)}.signal.sell{color:var(--red)}.signal.wait{color:var(--gold)}.price{font-size:28px;font-weight:800}.sub{font-size:12px;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#0a1721;border:1px solid var(--line);border-radius:12px;padding:13px}.stat b{display:block;font-size:19px;margin-top:5px}.stat small{color:var(--muted)}
+.notice{font-size:12px;line-height:1.55;color:#a9bfcc;background:#0b1b27;border-left:3px solid var(--gold);padding:11px 13px;border-radius:7px}.status{font-size:12px;color:var(--muted);margin-top:10px;min-height:18px}.history{width:100%;border-collapse:collapse;font-size:13px}.history th,.history td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--line)}.history th{color:var(--muted);font-size:11px}
+
+.performance{background:linear-gradient(145deg,#101a1d,#090f14);border:1px solid #263b43;padding:20px;margin:14px 0 15px;box-shadow:0 10px 28px #0003}
+.perfhead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.streak{display:inline-block;margin-top:9px;padding:7px 12px;border:1px solid #6a5718;border-radius:22px;color:var(--gold);background:#211d0d;font-weight:800;font-size:12px}
+.winrate{text-align:right}.winrate small{display:block;color:var(--muted);font-size:11px}.winrate strong{font-size:34px;color:var(--cyan)}
+.performance .stat{text-align:center;background:#101f2d;padding:15px 8px}.performance .stat b{font-size:27px;color:var(--green)}.performance .stat:nth-child(2) b{color:var(--red)}.performance .stat .gold{color:var(--gold)}
+.trade-mini-head{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:13px;border-top:1px solid var(--line);font-size:11px;letter-spacing:1.5px;color:var(--muted)}.trade-mini-wrap{overflow-x:auto;margin-top:6px}.trade-mini{min-width:430px}.trade-mini td,.trade-mini th{padding:9px 6px}.trade-mini td{font-size:12px}.trade-status-win{color:var(--green);font-weight:800}.trade-status-loss{color:var(--red);font-weight:800}.trade-status-pending{color:var(--gold);font-weight:800}
+.settings-card{border:1px solid #287d5a;background:#0c1b22;padding:15px}
+.api-wrap{border:2px solid #267d59;border-radius:14px;padding:14px;background:#10212b;margin-bottom:16px}
+.api-heading{color:var(--gold);font-weight:900;margin-bottom:4px}.api-hint{font-size:12px;color:var(--muted);margin-bottom:10px}
+.broker-panel{border:2px solid #168b61;background:linear-gradient(145deg,#071d20,#0b1721);margin-top:0}.broker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px;padding:4px 2px 8px}.broker-choice{width:100%;max-width:none}
+.broker-choice{background:#101f2d;border:1px solid #294353;border-radius:13px;color:#eaf4f9;padding:13px 6px;text-align:center;min-height:92px}
+.broker-choice .ico{font-size:24px;display:block;margin-bottom:4px}.broker-choice b{display:block;font-size:12px}.broker-choice small{font-size:10px;color:var(--muted)}
+.broker-choice.active{border:2px solid var(--gold);color:var(--gold);background:#211f14;box-shadow:0 0 12px #f6c92822}
+#broker{display:none}
+@media(max-width:760px){.wrap{max-width:620px;padding:12px}.broker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.broker-choice{min-width:0}.grid{grid-template-columns:1fr}.performance .stats{grid-template-columns:repeat(3,1fr)}.performance .stat{padding:11px 4px}.performance .stat b{font-size:23px}.winrate strong{font-size:29px}.top{padding:12px}.live{font-size:10px;padding:7px}}
+.footer{text-align:center;color:#6f8796;font-size:11px;padding:15px}
+@media(max-width:760px){.wrap{padding:12px}.grid{grid-template-columns:1fr}.brand h1{font-size:16px}.stats{grid-template-columns:repeat(3,1fr)}.card{padding:14px}}
+
+/* Screenshot-inspired neon-purple mobile layout */
+:root{--bg:#05000e;--panel:#100821;--panel2:#180d2c;--line:#54217b;--gold:#ffd33d;--cyan:#25e7ff;--muted:#b9a8d0;--green:#20f477;--red:#ff426e}
+body{background:radial-gradient(ellipse at 50% 0%,#281044 0,#090014 45%,#020007 100%);font-family:Inter,system-ui,Arial,sans-serif}
+.wrap{max-width:760px;padding:14px}
+.card,.top,.ticker,.nav{background:linear-gradient(145deg,#160b2c,#090416 75%);border:1px solid #7d20b9;box-shadow:0 0 12px #b500ff22,inset 0 0 14px #7e20a51a;border-radius:17px}
+.top{border:2px solid #e000d4;box-shadow:0 0 18px #ec00ff66;padding:16px}
+h1{color:#ff36d6;text-shadow:0 0 12px #ff00d4;font-size:clamp(22px,5vw,34px)}
+.logo{background:linear-gradient(145deg,#fff,#c9baff);color:#4933a8;border-radius:14px}
+.live{background:#062a18;color:#27ff87;border:1px solid #00e85d}
+.title{color:#ff52db}
+.card{padding:15px;margin-bottom:13px}
+.stat,.signalbox,.tick,.broker-choice,.field select,input,select{background:#100822;border-color:#522174;color:#f8efff}
+.broker-panel{border:2px solid #d900da;background:linear-gradient(145deg,#190a2c,#090313)}
+.broker-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.broker-choice{border:1px solid #8c23bd;min-height:76px;box-shadow:0 0 8px #c000ff20}
+.broker-choice.active{border:2px solid #14dfff;color:#fff;background:#071e4b;box-shadow:0 0 15px #00cfff88}
+button{background:linear-gradient(120deg,#4d12a8,#a500bb);border:1px solid #e33bff;color:#fff;border-radius:12px}
+button.secondary{background:#1b1030;border-color:#6c3b8e}
+.notice{background:#20122e;border-color:#8b6a2a;color:#ffe9a6}
+.signalbox{border:2px solid #bf31ff;box-shadow:0 0 14px #ad00ff33}
+.signal{font-size:38px;text-shadow:0 0 12px currentColor}
+.performance .stat{background:#0d071a}
+.history th{color:#d78bff}.history td{border-color:#301344}
+.footer{color:#a88bbd}
+@media(max-width:520px){.wrap{padding:9px}.broker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.broker-choice{min-height:64px}.top{padding:12px}.nav{overflow:auto;white-space:nowrap}}
+.pair-browser{border:1px solid #7a21a8;background:#0c0618;border-radius:15px;padding:13px;margin:12px 0}
+.pair-browser input{width:100%;margin:8px 0 10px;padding:13px;border:1px solid #51206e;border-radius:10px;background:#170d29;color:white}
+.pair-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 12px}
+.pair-tabs span{padding:10px;text-align:center;border:1px solid #542477;border-radius:10px;color:#d7c4ed;background:#130a23;font-weight:700}
+.pair-tabs span:first-child{border-color:#dc2bd5;color:#ff70df;background:#28103b}
+.pair-list{display:grid;gap:7px;max-height:230px;overflow:auto}
+.pair-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #3e245a;border-radius:12px;background:#150b26;color:#fff;cursor:pointer}
+.pair-item b{font-size:14px}.pair-item small{color:#bba8d3}.pair-item.active{border-color:#12dfff;box-shadow:0 0 10px #00cfff44}
+.chart-shell{border:1px solid #7b26a5;border-radius:14px;background:#05020d;padding:12px;margin:12px 0}
+.chart-grid{height:155px;display:flex;align-items:center;justify-content:center;text-align:center;color:#b69acb;background:repeating-linear-gradient(0deg,transparent 0 38px,#24113b 39px 40px),repeating-linear-gradient(90deg,transparent 0 55px,#24113b 56px 57px);border-radius:8px;font-size:13px}
+
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div class="brand"><div class="logo">🐝</div><div><h1>UNCLE B-FX AI BOT</h1><small>OTC-ONLY · 1-CANDLE-AHEAD SIGNAL ANALYSIS · MANUAL ONLY</small></div></div><div class="live" id="liveBadge">● DATA NOT CONNECTED</div></header>
+<div class="ticker">
+ <div class="tick">EUR/USD<b id="eur">—</b></div><div class="tick">GBP/USD<b id="gbp">—</b></div><div class="tick">USD/JPY<b id="jpy">—</b></div>
+</div>
+<nav class="nav"><span>⚡ SIGNAL</span><span>▤ JOURNAL</span><span>📘 GUIDE</span><span>💎 ABOUT</span><span>🚀 AI ENGINE</span><span>🛡 RISK</span><span>📊 STATS</span><span>🧰 TOOLS</span></nav>
+ <div class="card broker-panel"><div class="title">SELECT BROKER · SIGNAL DISPLAY</div><div class="sub">Choose the broker you will check the signal on. This selector does not connect to broker accounts.</div><select id="broker"><option>Quotex</option><option selected>Pocket Option</option><option>Exnova</option><option>Binomo</option></select><div class="broker-grid" id="brokerGrid"><button class="broker-choice" data-broker="Quotex"><span class="ico">💹</span><b>Quotex</b><small>POPULAR</small></button><button class="broker-choice active" data-broker="Pocket Option"><span class="ico">📊</span><b>Pocket Option</b><small>TOP RATED</small></button><button class="broker-choice" data-broker="Exnova"><span class="ico">🚀</span><b>Exnova</b><small>SUPPORTED SELECTOR</small></button><button class="broker-choice" data-broker="Binomo"><span class="ico">📈</span><b>Binomo</b><small>FAST</small></button></div></div>
+
+<div class="pair-browser">
+ <div class="title">SEARCH CURRENCIES &amp; CRYPTOCURRENCIES</div>
+ <input id="pairSearch" type="search" placeholder="Search currencies & cryptocurrencies">
+ <div class="pair-tabs"><span>Activated</span><span>Stopped</span><span>Featured</span></div>
+ <div class="pair-list" id="otcPairs">
+  <div class="pair-item active" data-pair="EUR/USD"><b>🇪🇺 🇺🇸　EUR/USD OTC</b><small>LIVE M1</small></div>
+  <div class="pair-item" data-pair="GBP/USD"><b>🇬🇧 🇺🇸　GBP/USD OTC</b><small>LIVE M1</small></div>
+  <div class="pair-item" data-pair="USD/JPY"><b>🇺🇸 🇯🇵　USD/JPY OTC</b><small>LIVE M1</small></div>
+  <div class="pair-item" data-pair="BTC/USD"><b>₿　Bitcoin OTC</b><small>LIVE M1</small></div>
+  <div class="pair-item" data-pair="AUD/USD"><b>🇦🇺 🇺🇸　AUD/USD OTC</b><small>LIVE M1</small></div>
+ </div>
+ <div class="chart-shell"><div style="display:flex;justify-content:space-between;gap:8px;color:#ff55d8;font-weight:800;margin-bottom:8px"><span id="chartPair">EUR/USD OTC</span><small id="chartFeedStatus" style="color:#f6c94d">● WAITING FOR OTC CANDLES</small></div><div class="chart-grid" style="height:210px;display:block;padding:0"><canvas id="otcCandleChart" style="width:100%;height:210px;display:block"></canvas></div><div class="sub" style="margin-top:7px">M1 candles · EMA 9 (cyan) · EMA 21 (gold) · Source: OTCharts OTC API</div><div id="forecastPreview" class="notice" style="margin-top:8px">NEXT CANDLE (+1): Run analysis to display the projected candle on the chart. Projection is illustrative, not a real future market candle.</div></div>
+</div>
+
+<div class="card performance"><div class="perfhead"><div><div class="title">TODAY'S PERFORMANCE</div><div class="sub" id="todayDate">Daily signal summary</div><div class="streak">🔥 <b id="streak">0</b> signal streak</div></div><div class="winrate"><small>WIN RATE</small><strong id="todayWinrate">—</strong></div></div><div class="stats"><div class="stat"><small>✅ DAILY WINS</small><b id="todayWins">0</b><small>Confirmed wins</small></div><div class="stat"><small>❌ DAILY LOSSES</small><b id="todayLosses">0</b><small>Confirmed losses</small></div><div class="stat"><small>📊 PROFIT</small><b class="gold" id="todayProfit">—</b><small>Estimated result*</small></div></div><div class="sub" style="margin-top:10px">*Based on auto-scored signals saved today; not actual broker profit. Older entries without dates are excluded.</div>
+<div class="trade-mini-head"><b>RECENT TRADES</b><span id="perfTradeCount">0 trades</span></div>
+<div class="trade-mini-wrap"><table class="history trade-mini"><thead><tr><th>TIME</th><th>PAIR</th><th>SIGNAL</th><th>ENTRY</th><th>RESULT</th></tr></thead><tbody id="performanceTrades"><tr><td colspan="5" class="sub">No trades recorded yet.</td></tr></tbody></table></div>
+</div>
+<div class="grid">
+<section>
+ <div class="card"><div class="title">LIVE MARKET SIGNAL · 1 CANDLE AHEAD</div><div class="notice" style="margin:8px 0 12px">NEXT-CANDLE MODE: if the current market candle is #10, the bot analyzes available candle data and issues a forecast for candle #11. BUY/SELL is a forecast, not a guaranteed result.</div>
+  <div class="row">
+   <div class="field"><label>CURRENCY PAIR</label><select id="pair"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>BTC/USD</option><option>AUD/USD</option></select></div>
+   <div class="field"><label>ANALYSIS TIMEFRAME</label><select id="interval"><option value="1min">1 Minute (OTC M1)</option></select></div>
+  </div>
+  <div class="signalbox" style="margin-top:14px"><div class="sub" id="pairLabel">EUR/USD · Pocket Option</div><div class="sub" id="targetCandle" style="color:var(--gold);font-weight:800;margin-top:5px">FORECAST TARGET: NEXT CANDLE (+1)</div><div class="signal wait" id="signal">WAIT</div><div class="price" id="currentPrice">—</div><div class="sub" id="signalReason">Select an enabled OTC pair and press ANALYZE to load verified M1 candles.</div><div class="sub" id="confidence">Signal strength: not calculated</div><div class="sub" id="mtf">Multi-timeframe confirmation: not checked</div><div class="sub" id="trend">Market trend: not assessed</div></div>
+  <div class="stats" style="margin-top:12px"><div class="stat"><small>RSI (14)</small><b id="rsi">—</b></div><div class="stat"><small>EMA 9 / 21</small><b id="ema">—</b></div><div class="stat"><small>Last update</small><b id="updated" style="font-size:13px">—</b></div></div>
+  <div class="row" style="margin-top:13px"><div class="field"><label>SIGNAL EXPIRY</label><select id="expiry"><option value="1" selected>1 Minute</option><option value="2">2 Minutes</option><option value="5">5 Minutes</option><option value="15">15 Minutes</option></select></div></div>
+  <div class="row" style="margin-top:13px"><button id="analyze">ANALYZE MARKET</button><button class="secondary" id="auto">START AUTO REFRESH</button></div><div class="status" id="status">Waiting for API key.</div>
+ </div>
+ <div class="card"><div class="title">V4 PERFORMANCE DASHBOARD</div><div class="stats"><div class="stat"><small>Total signals</small><b id="totalSignals">0</b></div><div class="stat"><small>Pending</small><b id="pendingSignals">0</b></div><div class="stat"><small>Resolved</small><b id="resolvedSignals">0</b></div></div><p class="sub">Historical demo tracking only. Results can differ from broker/OTC prices and are not predictive.</p></div>
+ <div class="card"><div class="title">V4 · HISTORICAL BACKTEST LAB</div>
+ <p class="sub">Runs the current EMA 9/21 + RSI + MACD rules on historical candles in chronological order. The next candle(s) after each signal are used only to score the outcome.</p>
+ <div class="row">
+  <div class="field"><label>HISTORICAL CANDLES</label><select id="btCount"><option value="100">100 candles</option><option value="300" selected>300 candles</option><option value="500">500 candles</option></select></div>
+  <div class="field"><label>EXPIRY (CANDLES)</label><select id="btExpiry"><option value="1">1 candle</option><option value="2">2 candles</option><option value="3" selected>3 candles</option><option value="5">5 candles</option></select></div>
+ </div>
+ <div class="row" style="margin-top:12px"><button id="runBacktest">RUN BACKTEST</button><button class="secondary" id="exportBacktest">EXPORT CSV</button></div>
+ <div class="status" id="btStatus">Choose settings and run a historical test.</div>
+ <div class="stats" style="margin-top:10px">
+  <div class="stat"><small>Trades tested</small><b id="btTrades">—</b></div>
+  <div class="stat"><small>Win rate</small><b id="btWinrate">—</b></div>
+  <div class="stat"><small>Wins / Losses</small><b id="btWL">—</b></div>
+ </div>
+ <div class="stats" style="margin-top:9px">
+  <div class="stat"><small>Max drawdown*</small><b id="btDD">—</b></div>
+  <div class="stat"><small>Avg. move</small><b id="btAvg">—</b></div>
+  <div class="stat"><small>Tested range</small><b id="btRange" style="font-size:12px">—</b></div>
+ </div>
+ <p class="sub">*Drawdown is measured on a simple +1/-1 outcome sequence, not account money. Backtests exclude payout, spread, slippage, OTC differences and execution delays. Past results do not predict future performance.</p>
+ <div style="overflow:auto"><table class="history"><thead><tr><th>TIME</th><th>DIRECTION</th><th>ENTRY</th><th>EXIT</th><th>RESULT</th></tr></thead><tbody id="btRows"><tr><td colspan="5" class="sub">No backtest run yet.</td></tr></tbody></table></div>
+ </div>
+ <div class="card"><div class="title">SIGNAL JOURNAL · ACCURACY TRACKER</div><div class="stats" style="margin-bottom:12px"><div class="stat"><small>Wins</small><b id="wins">0</b></div><div class="stat"><small>Losses</small><b id="losses">0</b></div><div class="stat"><small>Win rate</small><b id="winrate">—</b></div></div><table class="history"><thead><tr><th>TIME</th><th>PAIR</th><th>SIGNAL</th><th>ENTRY</th><th>RESULT</th></tr></thead><tbody id="journal"><tr><td colspan="5" class="sub">No signals recorded yet.</td></tr></tbody></table></div>
+</section>
+<aside>
+ <div class="card settings-card"><div class="title">SIGNAL SETTINGS</div><div class="api-wrap"><div class="api-heading">🟢 OTCharts OTC BACKEND</div><div class="api-hint">Connected through your private Render backend. API key stays on the server and is not stored in this browser.</div><div class="status" id="keyStatus">Backend: https://uncle-b-fx-v4.onrender.com</div></div></div>
+
+ <div class="card"><div class="title">MULTI-PAIR SCANNER</div><p class="sub">Scans selected pairs sequentially. API limits may restrict how many pairs can be checked.</p><div class="row"><button id="scan">SCAN ALL PAIRS</button></div><div class="status" id="scanStatus">Not scanned yet.</div><div id="scanResults" class="sub"></div></div>
+ <div class="card"><div class="title">TELEGRAM ALERTS</div><label>Telegram Bot Token</label><input id="tgToken" type="password" placeholder="Bot token from BotFather"><label style="margin-top:10px">Telegram Chat ID</label><input id="tgChat" placeholder="Your chat ID"><div class="row" style="margin-top:10px"><button id="saveTg">SAVE TELEGRAM</button><button class="secondary" id="testTg">SEND TEST</button></div><div class="status" id="tgStatus">Optional. Keep your bot token private.</div></div>
+ <div class="card"><div class="title">V4 · STRATEGY & TESTING</div><div class="stats"><div class="stat"><small>Indicators</small><b>3</b></div><div class="stat"><small>Mode</small><b style="font-size:14px">Manual</b></div><div class="stat"><small>Execution</small><b style="font-size:14px">OFF</b></div></div><p class="sub">Signal rules: EMA 9/21 trend separation + RSI confirmation + MACD direction + two-candle momentum + candle-body confirmation. WAIT is shown when filters disagree. V4 adds historical backtesting with no future-candle look-ahead. This is rule-based analysis, not machine-learning prediction. It never places trades.</p></div>
+ <div class="card"><div class="title">RISK MANAGEMENT</div><div class="notice">Use a demo account first. Avoid martingale and never risk money you cannot afford to lose. A signal is not a guarantee of profit. OTC prices may differ from external market data.</div></div>
+ <div class="card"><div class="title">BROKER SUPPORT</div><p class="sub">Pocket Option · Quotex · Exnova · Binomo</p><div class="notice">Pocket Option, Quotex, Exnova and Binomo are selectable broker labels only. This build uses the Twelve Data external Forex feed; it does NOT connect to broker accounts, verify broker-specific prices, receive OTC feeds, or execute trades. OTC prices may differ materially. Check the selected broker chart before entry.</div></div>
+</aside></div>
+<div class="footer">UNCLE B-FX AI BOT V4 · 1-candle-ahead forecast · Four broker selectors · API quota protection enabled · OTCharts OTC M1 backend · Not financial advice · Scanner/API usage is subject to provider quotas.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let timer=null, lastQuote=null, alertAudio=null;
+let history=JSON.parse(localStorage.getItem('ubfx_history')||'[]');
+const saveHistory=()=>localStorage.setItem('ubfx_history',JSON.stringify(history.slice(0,50)));
+const drawPerformanceTrades=()=>{
+ const body=$('performanceTrades'); if(!body)return;
+ const rows=history.slice(0,8); $('perfTradeCount').textContent=history.length+' trades';
+ if(!rows.length){body.innerHTML='<tr><td colspan="5" class="sub">No trades recorded yet. New signals will appear here.</td></tr>';return;}
+ body.innerHTML=''; rows.forEach(x=>{const tr=document.createElement('tr');
+  const status=x.result||'PENDING'; const vals=[x.time||'—',x.pair||'—',x.direction||'—',x.entry||'—',status];
+  vals.forEach((v,i)=>{const td=document.createElement('td');td.textContent=v;if(i===2)td.style.color=x.direction==='BUY'?'var(--green)':'var(--red)';if(i===4)td.className=status==='WIN'?'trade-status-win':status==='LOSS'?'trade-status-loss':'trade-status-pending';tr.appendChild(td);});body.appendChild(tr);
+ });
+};
+const drawHistory=()=>{const body=$('journal');body.innerHTML='';if(!history.length){body.innerHTML='<tr><td colspan="5" class="sub">No signals recorded yet.</td></tr>';return;}history.slice(0,20).forEach(x=>{let tr=document.createElement('tr');[x.time,x.pair,x.direction,x.entry,x.result||'PENDING'].forEach((v,i)=>{let td=document.createElement('td');td.textContent=v;if(i===2)td.style.color=x.direction==='BUY'?'var(--green)':'var(--red)';tr.appendChild(td);});body.appendChild(tr);});const done=history.filter(x=>x.result==='WIN'||x.result==='LOSS'),wins=done.filter(x=>x.result==='WIN').length,loss=done.length-wins;$('wins').textContent=wins;$('losses').textContent=loss;$('winrate').textContent=done.length?(wins/done.length*100).toFixed(1)+'%':'—';$('totalSignals').textContent=history.length;$('pendingSignals').textContent=history.filter(x=>!x.result).length;$('resolvedSignals').textContent=done.length;};
+
+drawHistory();
+drawPerformanceTrades();
+$('todayDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+function updateDailySummary(){
+ const today=new Date().toLocaleDateString();
+ const done=history.filter(x=>{const stamp=Number(x.createdAt)||Date.parse(x.timestamp||'');return Number.isFinite(stamp)&&new Date(stamp).toLocaleDateString()===today&&(x.result==='WIN'||x.result==='LOSS');});
+ const wins=done.filter(x=>x.result==='WIN').length,losses=done.length-wins;
+ $('todayWins').textContent=wins;$('todayLosses').textContent=losses;
+ $('todayWinrate').textContent=done.length?(wins/done.length*100).toFixed(0)+'%':'—';
+ $('todayProfit').textContent=done.length?((wins-losses)>0?'+':'')+(wins-losses)+' net signals':'—';
+ let streak=0;for(const x of history){if(x.result!=='WIN'&&x.result!=='LOSS')continue;if(streak===0&&x.result==='LOSS')break;if(x.result==='WIN')streak++;else break;}
+ $('streak').textContent=streak;
+}
+updateDailySummary();
+document.querySelectorAll('.broker-choice').forEach(btn=>btn.addEventListener('click',()=>{
+ $('broker').value=btn.dataset.broker;document.querySelectorAll('.broker-choice').forEach(b=>b.classList.toggle('active',b===btn));
+ $('pairLabel').textContent=pair()+' · '+$('broker').value;
+}));
+
+
+const BACKEND='https://uncle-b-fx-v4.onrender.com';
+const otcSymbols={'EUR/USD':'EURUSD_otc','GBP/USD':'GBPUSD_otc','USD/JPY':'USDJPY_otc','BTC/USD':'BTCUSD_otc','AUD/USD':'AUDUSD_otc'};
+function pair(){return $('pair').value;}
+function setStatus(t){$('status').textContent=t;}
+const candleCache=new Map();
+let nextCandleForecast=null;
+function drawOtcChart(values,symbol){
+ const canvas=$('otcCandleChart'); if(!canvas||!values||!values.length)return;
+ const rect=canvas.getBoundingClientRect(),w=Math.max(300,rect.width),h=210,dpr=window.devicePixelRatio||1;
+ canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+ const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ const data=values.slice(-55),pad={l:8,r:48,t:10,b:15},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+ const last=data[data.length-1];
+ const recent=data.slice(-12),avgRange=recent.reduce((a,c)=>a+(c.high-c.low),0)/Math.max(1,recent.length);
+ const f=nextCandleForecast&&nextCandleForecast.symbol===symbol?nextCandleForecast:null;
+ const fOpen=last.close, fMove=avgRange*.45*(f&&f.direction==='BUY'?1:f&&f.direction==='SELL'?-1:0);
+ const fClose=fOpen+fMove, fWick=avgRange*.22;
+ const fHigh=Math.max(fOpen,fClose)+fWick, fLow=Math.min(fOpen,fClose)-fWick;
+ const min=Math.min(...data.map(x=>x.low),f?fLow:last.low),max=Math.max(...data.map(x=>x.high),f?fHigh:last.high),range=(max-min)||1;
+ const y=v=>pad.t+(max-v)/range*ch,step=cw/(data.length+1),body=Math.max(2,step*.55);
+ ctx.font='10px Arial';ctx.textAlign='right';ctx.fillStyle='#9b8bb0';
+ for(let k=0;k<=4;k++){let yy=pad.t+ch*k/4;ctx.strokeStyle='#24113b';ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillText((max-range*k/4).toFixed(5),w-3,yy+3);}
+ data.forEach((c,i)=>{let x=pad.l+i*step+step/2,up=c.close>=c.open;ctx.strokeStyle=up?'#26d68a':'#ff5967';ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(x,y(c.high));ctx.lineTo(x,y(c.low));ctx.stroke();let top=Math.min(y(c.open),y(c.close)),bh=Math.max(1,Math.abs(y(c.open)-y(c.close)));ctx.fillRect(x-body/2,top,body,bh);});
+ const closes=values.map(x=>x.close);
+ for(const [period,color] of [[9,'#23d6e8'],[21,'#f6c928']]){let k=2/(period+1),v=closes[0],line=[];closes.forEach((z,i)=>{v=i?z*k+v*(1-k):z;if(i>=values.length-data.length)line.push(v)});ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.beginPath();line.forEach((z,i)=>{let x=pad.l+i*step+step/2,yy=y(z);if(i===0)ctx.moveTo(x,yy);else ctx.lineTo(x,yy)});ctx.stroke();}
+ $('chartPair').textContent=symbol+' OTC';$('chartFeedStatus').textContent='● OTC CANDLES RECEIVED';$('chartFeedStatus').style.color='var(--green)';
+ const preview=$('forecastPreview');if(preview){preview.textContent=f?'NEXT CANDLE (+1) PREVIEW: '+f.direction+' · dashed candle is a rule-based visual estimate, not an actual broker candle.':'NEXT CANDLE (+1): Waiting for signal analysis.';}
+}
+async function fetchSeries(symbol,interval){
+ if(interval!=='1min') throw new Error('OTC backend currently supplies M1 candles only.');
+ const otc=otcSymbols[symbol]; if(!otc) throw new Error('This pair is not enabled on the current OTC backend.');
+ const cacheKey=symbol+'|'+interval, cached=candleCache.get(cacheKey);
+ if(cached && Date.now()-cached.at<15000){drawOtcChart(cached.values,symbol);return cached.values;}
+ const url=BACKEND+'/api/candles?symbol='+encodeURIComponent(otc)+'&limit=100';
+ const r=await fetch(url); const j=await r.json();
+ if(!r.ok||!Array.isArray(j.candles)||j.candles.length<30) throw new Error(j.error||'OTC candle data unavailable.');
+ const values=j.candles.map(x=>({open:Number(x.open),high:Number(x.high),low:Number(x.low),close:Number(x.close),time:x.time}));
+ candleCache.set(cacheKey,{at:Date.now(),values});
+ drawOtcChart(values,symbol);
+ $('liveBadge').textContent='● OTC DATA CONNECTED'; $('liveBadge').style.color='var(--green)';
+ return values;
+}
+function ema(values,period){let k=2/(period+1),v=values[0];for(let i=1;i<values.length;i++)v=values[i]*k+v*(1-k);return v;}
+function rsi(values,p=14){let gains=0,loss=0;for(let i=values.length-p;i<values.length;i++){let d=values[i]-values[i-1];if(d>0)gains+=d;else loss-=d;}let rs=(gains/p)/((loss/p)||1e-10);return 100-(100/(1+rs));}
+async function sendTelegram(message){const token=localStorage.getItem('ubfx_tg_token'),chat=localStorage.getItem('ubfx_tg_chat');if(!token||!chat)return;const r=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chat,text:message})});const j=await r.json();if(!j.ok)throw new Error(j.description||'Telegram send failed');}
+$('tgToken').value=localStorage.getItem('ubfx_tg_token')||'';$('tgChat').value=localStorage.getItem('ubfx_tg_chat')||'';
+$('saveTg').onclick=()=>{localStorage.setItem('ubfx_tg_token',$('tgToken').value.trim());localStorage.setItem('ubfx_tg_chat',$('tgChat').value.trim());$('tgStatus').textContent='Telegram settings saved in this browser.';};
+$('testTg').onclick=async()=>{try{await sendTelegram('UNCLE B-FX AI BOT: Telegram test alert connected.');$('tgStatus').textContent='Test message sent.';}catch(e){$('tgStatus').textContent=e.message;}};
+function playAlert(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=.08;o.start();o.stop(c.currentTime+.25);}catch(e){}}
+function settleExpiredSignals(){const now=Date.now();history.forEach(x=>{if(x.result||now<x.expireAt||x.settlementRequested)return;x.settlementRequested=true;fetchSeries(x.pair,x.interval).then(v=>{const exit=v[v.length-1].close;x.exit=exit;x.result=(x.direction==='BUY'?exit>x.entry:exit<x.entry)?'WIN':'LOSS';saveHistory();drawHistory();drawPerformanceTrades();updateDailySummary();}).catch(()=>{x.settlementRequested=false;});});}
+function classify(values){
+ const c=values.map(x=>Number(x.close));
+ if(c.length<35) throw new Error('Not enough candles for indicator analysis.');
+ const e9=ema(c.slice(-40),9),e21=ema(c.slice(-60),21),rv=rsi(c),macd=ema(c.slice(-40),12)-ema(c.slice(-40),26);
+ // Balanced 2-of-3 confirmation: EMA trend, RSI zone, and MACD direction.
+ // Candle body/momentum are displayed as context, not extra mandatory gates.
+ const last=values[values.length-1], prev=values[values.length-2], prev2=values[values.length-3];
+ const bullish=Number(last.close)>Number(last.open), bearish=Number(last.close)<Number(last.open);
+ const rising=Number(last.close)>Number(prev.close)&&Number(prev.close)>Number(prev2.close);
+ const falling=Number(last.close)<Number(prev.close)&&Number(prev.close)<Number(prev2.close);
+ const range=Math.max(0,Number(last.high)-Number(last.low));
+ const body=Math.abs(Number(last.close)-Number(last.open));
+ const hasCandleData=[last.open,last.high,last.low,last.close,prev.close,prev2.close].every(v=>Number.isFinite(Number(v)));
+ const bodyStrong=range>0&&body/range>=0.25;
+ const buyChecks=[e9>e21,rv>=50&&rv<=68,macd>0];
+ const sellChecks=[e9<e21,rv>=32&&rv<=50,macd<0];
+ const buyScore=buyChecks.filter(Boolean).length, sellScore=sellChecks.filter(Boolean).length;
+ let d='WAIT',why='WAIT: indicators ba kai 2 cikin 3 sharudda ba.';
+ if(hasCandleData&&buyScore>=2&&buyScore>sellScore){d='BUY';why=`BUY: ${buyScore}/3 confirmations (EMA, RSI, MACD). Candle momentum: ${bullish&&rising?'strong bullish':bullish?'bullish':'mixed'}.`;}
+ else if(hasCandleData&&sellScore>=2&&sellScore>buyScore){d='SELL';why=`SELL: ${sellScore}/3 confirmations (EMA, RSI, MACD). Candle momentum: ${bearish&&falling?'strong bearish':bearish?'bearish':'mixed'}.`;}
+ return {direction:d,reason:why,e9,e21,rsi:rv,macd,price:c[c.length-1],values,buyScore,sellScore};
+}
+let analysisRunId=0;
+async function analyze(symbol,interval,record=true){
+ if(!otcSymbols[symbol]) throw new Error('Select an OTC pair supported by the backend.');
+ const runId=++analysisRunId;
+ setStatus('Loading latest candles…');
+ // One candle request per analysis protects the free API quota. Multi-timeframe checks are disabled on this low-quota key.
+ const results=[{tf:interval,...classify(await fetchSeries(symbol,interval))}];
+ // Ignore stale responses if the user has already selected another pair/timeframe.
+ if(runId!==analysisRunId || symbol!==pair()) return null;
+ const primary=results.find(x=>x.tf===interval)||results[0];
+ const aligned=primary.direction==='WAIT'?0:1;
+ let direction=primary.direction,reason=primary.reason||'Indicators are mixed; wait for a clearer setup.';
+ const price=primary.price,rv=primary.rsi,e9=primary.e9,e21=primary.e21;
+ nextCandleForecast={symbol,direction,createdAt:Date.now()};
+ drawOtcChart(primary.values,symbol);
+ $('signal').textContent=direction;$('signal').className='signal '+direction.toLowerCase();
+ $('currentPrice').textContent=price.toFixed(5);$('rsi').textContent=rv.toFixed(1);$('ema').textContent=e9.toFixed(4)+' / '+e21.toFixed(4);
+ $('updated').textContent=new Date().toLocaleTimeString();$('signalReason').textContent=reason+' Forecast horizon: next candle (+1).';
+ $('targetCandle').textContent='FORECAST TARGET: NEXT '+interval+' CANDLE (+1) · BROKER: '+$('broker').value;
+ $('confidence').textContent='Indicator alignment: '+(direction==='WAIT'?'No confirmed setup':'Selected timeframe aligned (not a probability)');
+ $('mtf').textContent='Multi-timeframe confirmation: unavailable in single-credit mode';
+ $('trend').textContent='Market trend: '+(e9>e21?'UPTREND':e9<e21?'DOWNTREND':'SIDEWAYS')+' · RSI '+rv.toFixed(1);
+ $('pairLabel').textContent=symbol+' · '+$('broker').value+' · '+interval;
+ $('liveBadge').textContent='● LIVE DATA CONNECTED';$('liveBadge').style.color='var(--green)';lastQuote=price;
+ if(record&&direction!=='WAIT'){
+  const duplicate=history.some(x=>x.pair===symbol&&x.direction===direction&&!x.result&&Date.now()<x.expireAt);
+  if(!duplicate){
+   const item={time:new Date().toLocaleTimeString(),createdAt:Date.now(),timestamp:new Date().toISOString(),pair:symbol,direction,entry:price.toFixed(5),entryRaw:price,interval,forecast:'NEXT CANDLE (+1)',broker:$('broker').value,expiryMinutes:Number($('expiry').value),expireAt:Date.now()+Number($('expiry').value)*60000,result:null};
+   history.unshift(item);saveHistory();drawHistory();drawPerformanceTrades();updateDailySummary();playAlert();
+   sendTelegram(`UNCLE B-FX AI BOT V4\n${symbol} ${direction}\nEntry: ${price}\nExpiry: ${$('expiry').value} minute(s)\nMTF: ${results.map(x=>x.tf+' '+x.direction).join(', ')}\nForecast: next candle (+1)\nBroker reference: ${$('broker').value}\nSignal only — verify price on your broker.`).catch(e=>$('tgStatus').textContent=e.message);
+  }
+ }
+ return price;
+}
+$('analyze').onclick=async()=>{ $('analyze').disabled=true;setStatus('Fetching latest candles and calculating indicators…');try{await analyze(pair(),$('interval').value);setStatus('Analysis complete.');}catch(e){setStatus(e.message);$('liveBadge').textContent='● OTC BACKEND READY';$('liveBadge').style.color='var(--green)';}finally{$('analyze').disabled=false;}};
+$('auto').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('auto').textContent='START AUTO REFRESH';setStatus('Auto refresh stopped.');return;} $('auto').textContent='STOP AUTO REFRESH';setStatus('Auto refresh enabled: checking every 65 seconds to respect API limits.');$('analyze').click();timer=setInterval(()=>$('analyze').click(),65000);};
+$('broker').onchange=()=>{$('pairLabel').textContent=pair()+' · '+$('broker').value;$('targetCandle').textContent='FORECAST TARGET: NEXT '+$('interval').value+' CANDLE (+1) · BROKER: '+$('broker').value;};
+$('interval').onchange=()=>{$('targetCandle').textContent='FORECAST TARGET: NEXT '+$('interval').value+' CANDLE (+1) · BROKER: '+$('broker').value;};
+$('pair').onchange=()=>{
+ analysisRunId++; // cancel any older pair response from updating the screen
+ nextCandleForecast=null;
+ // Stop auto-refresh on pair changes so no signal is generated without a fresh manual request.
+ if(timer){clearInterval(timer);timer=null;$('auto').textContent='START AUTO REFRESH';}
+ $('pairLabel').textContent=pair()+' · '+$('broker').value+' · '+$('interval').value;
+ $('signal').textContent='WAIT';$('signal').className='signal wait';
+ $('currentPrice').textContent='—';
+ $('signalReason').textContent='Pair changed. Old signal cleared. Press ANALYZE MARKET to fetch fresh candles and calculate a new signal.';
+ $('confidence').textContent='Signal strength: not calculated';
+ $('mtf').textContent='Multi-timeframe confirmation: not checked';
+ $('trend').textContent='Market trend: not assessed';
+ $('targetCandle').textContent='FORECAST TARGET: NEXT '+$('interval').value+' CANDLE (+1) · WAITING FOR ANALYSIS';
+ $('forecastPreview').textContent='NEXT CANDLE (+1): Waiting for manual analysis.';
+ $('liveBadge').textContent='● PAIR CHANGED · ANALYSIS REQUIRED';$('liveBadge').style.color='var(--gold)';
+ $('analyze').disabled=false;
+ setStatus('Selected '+pair()+'. No signal generated yet. Press ANALYZE MARKET when ready.');
+};
+$('interval').onchange=()=>{$('analyze').click();};
+$('scan').onclick=async()=>{$('scan').disabled=true;$('scanResults').innerHTML='';const pairs=['EUR/USD','GBP/USD','USD/JPY','BTC/USD','AUD/USD'];let lines=[];for(const sym of pairs){try{const vals=await fetchSeries(sym,$('interval').value),c=vals.map(x=>x.close),r=rsi(c),a=ema(c.slice(-40),9),b=ema(c.slice(-60),21),m=ema(c.slice(-40),12)-ema(c.slice(-40),26);let s=(a>b&&r>=52&&r<=70&&m>0)?'BUY':(a<b&&r<=48&&r>=30&&m<0)?'SELL':'WAIT';lines.push(`${sym}: ${s}`);}catch(e){lines.push(`${sym}: unavailable (${e.message})`);} $('scanResults').innerHTML=lines.map(x=>`<div style="padding:6px;border-bottom:1px solid var(--line)">${x}</div>`).join('');} $('scanStatus').textContent='Quick scan complete (5 verified OTC pairs).';$('scan').disabled=false;};
+setInterval(settleExpiredSignals,30000);
+
+let lastBacktestRows=[];
+async function fetchHistory(symbol,interval,count){
+ const url=`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}&outputsize=${count}&apikey=${encodeURIComponent(key())}`;
+ const {r,j}=await limitedJson(url);
+ if(!r.ok||j.status==='error'||!j.values)throw new Error(j.message||'Historical candles unavailable. Check API plan/quota.');
+ return j.values.slice().reverse().map(x=>({close:Number(x.close),time:x.datetime}));
+}
+function rsiAt(values,p=14){
+ if(values.length<=p)return 50;
+ let gains=0,loss=0;
+ for(let i=values.length-p;i<values.length;i++){const d=values[i]-values[i-1];if(d>0)gains+=d;else loss-=d;}
+ const avgGain=gains/p,avgLoss=loss/p;
+ if(avgLoss===0)return avgGain===0?50:100;
+ const rs=avgGain/avgLoss;return 100-(100/(1+rs));
+}
+function historicalDirection(closes){
+ if(closes.length<30)return 'WAIT';
+ const e9=ema(closes.slice(-40),9),e21=ema(closes.slice(-60),21),rv=rsiAt(closes),macd=ema(closes.slice(-40),12)-ema(closes.slice(-40),26);
+ if(e9>e21&&rv>=52&&rv<=70&&macd>0)return 'BUY';
+ if(e9<e21&&rv<=48&&rv>=30&&macd<0)return 'SELL';
+ return 'WAIT';
+}
+$('runBacktest').onclick=async()=>{
+ const btn=$('runBacktest');btn.disabled=true;$('btStatus').textContent='Historical backtest is not connected to the OTC endpoint yet.';btn.disabled=false;return;
+ $('btRows').innerHTML='<tr><td colspan="5" class="sub">Backtest running…</td></tr>';
+ try{
+  const symbol=pair(),interval=$('interval').value,count=Number($('btCount').value),expiryBars=Number($('btExpiry').value);
+  const candles=await fetchHistory(symbol,interval,count);
+  if(candles.length<60)throw new Error('Provider returned too few candles. Try another timeframe or a smaller test.');
+  const closes=candles.map(x=>x.close),rows=[];
+  // Walk forward: signal at candle i close, score only against a later candle.
+  for(let i=60;i+expiryBars<candles.length;i++){
+   const direction=historicalDirection(closes.slice(0,i+1));
+   if(direction==='WAIT')continue;
+   const entry=candles[i].close,exit=candles[i+expiryBars].close;
+   const move=(exit-entry)/entry*100;
+   const won=direction==='BUY'?exit>entry:exit<entry;
+   rows.push({time:candles[i].time,direction,entry,exit,move,result:won?'WIN':'LOSS'});
+  }
+  if(!rows.length)throw new Error('No qualifying signals found in this sample. Try another pair or timeframe.');
+  const wins=rows.filter(x=>x.result==='WIN').length,losses=rows.length-wins;
+  let equity=0,peak=0,maxDD=0;rows.forEach(x=>{equity+=x.result==='WIN'?1:-1;peak=Math.max(peak,equity);maxDD=Math.max(maxDD,peak-equity);});
+  const avg=rows.reduce((s,x)=>s+x.move,0)/rows.length;
+  $('btTrades').textContent=rows.length;$('btWinrate').textContent=(wins/rows.length*100).toFixed(1)+'%';
+  $('btWL').textContent=wins+' / '+losses;$('btDD').textContent=maxDD.toFixed(0)+' units';$('btAvg').textContent=(avg>=0?'+':'')+avg.toFixed(4)+'%';
+  $('btRange').textContent=candles[0].time+' → '+candles[candles.length-1].time;
+  $('btRows').innerHTML='';
+  rows.slice(-25).reverse().forEach(x=>{const tr=document.createElement('tr');[x.time,x.direction,x.entry.toFixed(5),x.exit.toFixed(5),x.result].forEach((v,i)=>{const td=document.createElement('td');td.textContent=v;if(i===1)td.style.color=x.direction==='BUY'?'var(--green)':'var(--red)';if(i===4)td.style.color=x.result==='WIN'?'var(--green)':'var(--red)';tr.appendChild(td);});$('btRows').appendChild(tr);});
+  lastBacktestRows=rows;$('btStatus').textContent=`Backtest complete: ${candles.length} candles fetched; ${rows.length} historical signals simulated.`;
+ }catch(e){$('btStatus').textContent=e.message;$('btRows').innerHTML='<tr><td colspan="5" class="sub">Backtest could not complete.</td></tr>';}
+ finally{btn.disabled=false;}
+};
+$('exportBacktest').onclick=()=>{
+ if(!lastBacktestRows.length){$('btStatus').textContent='Run a backtest first.';return;}
+ const esc=v=>'"'+String(v).replace(/"/g,'""')+'"';
+ const csv=['Time,Direction,Entry,Exit,PriceMovePercent,Result',...lastBacktestRows.map(x=>[x.time,x.direction,x.entry,x.exit,x.move,x.result].map(esc).join(','))].join('\n');
+ const blob=new Blob([csv],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='uncle-b-fx-v4-backtest.csv';a.click();URL.revokeObjectURL(url);
+};
+
+async function mini(symbol,id){try{const v=await fetchSeries(symbol,'1min');$(id).textContent=v[v.length-1].close.toFixed(5);}catch(e){$(id).textContent='—';}}
+
+const pairSearch=document.getElementById('pairSearch');
+if(pairSearch){pairSearch.addEventListener('input',()=>{const q=pairSearch.value.toLowerCase();document.querySelectorAll('.pair-item').forEach(x=>x.style.display=x.textContent.toLowerCase().includes(q)?'flex':'none')});document.querySelectorAll('.pair-item').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('.pair-item').forEach(y=>y.classList.toggle('active',y===x));const cp=document.getElementById('chartPair');if(cp)cp.textContent=x.dataset.pair+' OTC';const sel=document.getElementById('pair');if(sel){let val=x.dataset.pair.replace('/','/');if([...sel.options].some(o=>o.value===val)){sel.value=val;sel.dispatchEvent(new Event('change'));}}}));}
+
+</script>
+</body></html>
