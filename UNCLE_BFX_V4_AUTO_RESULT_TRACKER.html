@@ -375,6 +375,95 @@ async function mini(symbol,id){try{const v=await fetchSeries(symbol,'1min');$(id
 
 const pairSearch=document.getElementById('pairSearch');
 if(pairSearch){pairSearch.addEventListener('input',()=>{const q=pairSearch.value.toLowerCase();document.querySelectorAll('.pair-item').forEach(x=>x.style.display=x.textContent.toLowerCase().includes(q)?'flex':'none')});document.querySelectorAll('.pair-item').forEach(x=>x.addEventListener('click',()=>{document.querySelectorAll('.pair-item').forEach(y=>y.classList.toggle('active',y===x));const cp=document.getElementById('chartPair');if(cp)cp.textContent=x.dataset.pair+' OTC';const sel=document.getElementById('pair');if(sel){let val=x.dataset.pair.replace('/','/');if([...sel.options].some(o=>o.value===val)){sel.value=val;sel.dispatchEvent(new Event('change'));}}}));}
+// UNCLE B-FX V4 VOICE SYSTEM
+(function () {
+  let voiceEnabled = false;
+  let lastSpoken = '';
 
+  const voiceButton = document.createElement('button');
+  voiceButton.id = 'voiceToggle';
+  voiceButton.textContent = '🔇 VOICE OFF';
+
+  voiceButton.style.cssText =
+    'position:fixed;bottom:18px;right:15px;z-index:9999;padding:15px;border-radius:15px;font-weight:bold;';
+
+  document.body.appendChild(voiceButton);
+
+  function speak(message) {
+    if (!voiceEnabled || !('speechSynthesis' in window)) return;
+
+    speechSynthesis.cancel();
+
+    const speech = new SpeechSynthesisUtterance(message);
+    speech.lang = 'en-US';
+    speech.rate = 0.9;
+    speech.pitch = 1;
+    speech.volume = 1;
+
+    speechSynthesis.speak(speech);
+  }
+
+  voiceButton.onclick = function () {
+    voiceEnabled = !voiceEnabled;
+
+    voiceButton.textContent =
+      voiceEnabled ? '🔊 VOICE ON' : '🔇 VOICE OFF';
+
+    if (voiceEnabled) {
+      speak('Uncle B FX trading bot voice activated.');
+    } else {
+      speechSynthesis.cancel();
+    }
+  };
+
+  const signal = document.getElementById('signal');
+
+  if (signal) {
+    new MutationObserver(() => {
+      const direction = signal.textContent.trim();
+
+      if (
+        voiceEnabled &&
+        (direction === 'BUY' || direction === 'SELL') &&
+        direction !== lastSpoken
+      ) {
+        lastSpoken = direction;
+        speak(direction + ' signal confirmed. Check your entry.');
+      }
+
+      if (direction === 'WAIT') lastSpoken = '';
+    }).observe(signal, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
+  }
+
+  const journal = document.getElementById('journal');
+
+  if (journal) {
+    new MutationObserver(() => {
+      if (!voiceEnabled) return;
+
+      const rows = journal.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const result = row.cells[4]?.textContent.trim();
+        const key = row.cells[0]?.textContent + result;
+
+        if (
+          (result === 'WIN' || result === 'LOSS') &&
+          !row.dataset.voiceSpoken
+        ) {
+          row.dataset.voiceSpoken = 'yes';
+          speak(result === 'WIN' ? 'Trade won!' : 'Trade lost!');
+        }
+      });
+    }).observe(journal, {
+      childList: true,
+      subtree: true
+    });
+  }
+})();
 </script>
 </body></html>
