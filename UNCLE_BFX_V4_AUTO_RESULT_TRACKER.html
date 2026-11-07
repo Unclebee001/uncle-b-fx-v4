@@ -544,5 +544,80 @@ if(pairSearch){pairSearch.addEventListener('input',()=>{const q=pairSearch.value
   }
 
 })();
+// UNCLE B-FX V4 VOICE SYSTEM
+(function () {
+  let voiceEnabled = false;
+  let lastSignal = "";
+
+  const btn = document.createElement("button");
+  btn.id = "uncleVoiceButton";
+  btn.textContent = "🔇 VOICE OFF";
+
+  btn.style.cssText = `
+    position:fixed;
+    bottom:20px;
+    right:15px;
+    z-index:999999;
+    padding:15px 20px;
+    background:#00c853;
+    color:white;
+    border:2px solid white;
+    border-radius:12px;
+    font-weight:bold;
+    font-size:15px;
+  `;
+
+  document.body.appendChild(btn);
+
+  function speak(message) {
+    if (!voiceEnabled) return;
+
+    speechSynthesis.cancel();
+
+    const msg = new SpeechSynthesisUtterance(message);
+    msg.lang = "en-US";
+    msg.rate = 0.9;
+    msg.volume = 1;
+
+    speechSynthesis.speak(msg);
+  }
+
+  btn.onclick = function () {
+    voiceEnabled = !voiceEnabled;
+
+    btn.textContent = voiceEnabled
+      ? "🔊 VOICE ON"
+      : "🔇 VOICE OFF";
+
+    if (voiceEnabled) {
+      speak("Uncle B FX trading bot activated.");
+    } else {
+      speechSynthesis.cancel();
+    }
+  };
+
+  const signal = document.getElementById("signal");
+
+  if (signal) {
+    new MutationObserver(() => {
+      const value = signal.textContent.trim().toUpperCase();
+
+      if (
+        voiceEnabled &&
+        (value === "BUY" || value === "SELL") &&
+        value !== lastSignal
+      ) {
+        lastSignal = value;
+        speak(value + " signal confirmed.");
+      }
+
+      if (value === "WAIT") lastSignal = "";
+    }).observe(signal, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
+})();
 </script>
 </body></html>
