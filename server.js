@@ -1,3 +1,37 @@
+app.get("/api/symbols", async (req, res) => {
+  try {
+    if (!API_KEY) {
+      return res.status(503).json({
+        error: "OTCHARTS_API_KEY not configured"
+      });
+    }
+
+    const venue = req.query.venue || "otc";
+
+    if (!["otc", "forex"].includes(venue)) {
+      return res.status(400).json({
+        error: "Invalid venue"
+      });
+    }
+
+    const url = new URL("https://otcharts.com/v1/symbols");
+    url.searchParams.set("venue", venue);
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`
+      }
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+
+  } catch (error) {
+    res.status(500).json({
+      error: "Symbols connection failed"
+    });
+  }
+});
 const express = require("express");
 
 const app = express();
